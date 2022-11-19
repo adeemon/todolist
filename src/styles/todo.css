@@ -8,12 +8,9 @@
   border: 2px solid red;
   height: 100px;
   width: 100px;
-  color: blue;
+  color: brown;
 }
 .notDisplayed {
   display: none;
 }
-* {
-  margin: 0;
-}
-/*# sourceMappingURL=App.css.map */
+/*# sourceMappingURL=todo.css.map */
