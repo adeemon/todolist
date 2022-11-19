@@ -1,9 +1,11 @@
+import { DeleteButton } from "./DeleteButton"
+
 export const TodoNoteShort = ({id, title, status, onClickHandler}) => {
     return (
-        <div className="todoNote-short" onClick={onClickHandler}>
-            <div>{id}</div>
-            <div>{title}</div>
-            <div>{status ? 'Выполнено' : 'Не выполнено'}</div>
+        <div className="todo-note-short" >
+            <div className="id">{id}</div>
+            <div className="title">{title}</div>
+            <DeleteButton onClickHandler={onClickHandler} />
         </div>
     )
 }

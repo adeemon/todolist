@@ -1,4 +1,12 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+const emptyTodo = {
+    id: 0,
+    title: '',
+    status: 'false',
+    body: '',
+    isFullMode: 'true'
+}
+
 
 export const todoNotesSlice = createSlice({
     name: 'todoNotes',
@@ -7,12 +15,14 @@ export const todoNotesSlice = createSlice({
                 id: 1,
                 title: 'kekwait',
                 status: false,
+                body: 'lololol',
                 isFullMode: false,
             },
             {
                 id: 2,
                 title: 'kekwaitof',
                 status: true,
+                body: 'lololol',
                 isFullMode: false,
             }
         ],
@@ -45,6 +55,10 @@ export const selectAllTodos = (state) => {
 
 export const selectIsCreating = (state) => {
     return state.todoNotes.isCreating;
+}
+
+export const getEmptyTodo = () => {
+    return emptyTodo;
 }
 
 export const { addTodo, removeTodo, toggleStatus, openCreatingWindow } = todoNotesSlice.actions;

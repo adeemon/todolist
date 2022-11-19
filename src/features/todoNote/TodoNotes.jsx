@@ -38,10 +38,17 @@ export const TodoNotes = () => {
     
 
     return (
-        <div className="todoList-container">
-            <div className={isCreating ? "notDisplayed" : null}>Kekwait</div>
+        <div className="todo-list-container" >
             {listOfTodos ? listOfTodos : 'kekw'}
             <CreateButton onClickHandler={onOpenCreatingWindowHandler} />
         </div>
     )
+
+    // return (
+    //     <div className="todoList-container">
+    //         <div className={isCreating ? "notDisplayed" : null}>Kekwait</div>
+    //         {listOfTodos ? listOfTodos : 'kekw'}
+    //         <CreateButton onClickHandler={onOpenCreatingWindowHandler} />
+    //     </div>
+    // )
 }
