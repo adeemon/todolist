@@ -1,4 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+import produce from "immer"
 const emptyTodo = {
     id: 0,
     title: '',
@@ -6,7 +7,6 @@ const emptyTodo = {
     body: '',
     isFullMode: 'true'
 }
-
 
 export const todoNotesSlice = createSlice({
     name: 'todoNotes',
@@ -34,9 +34,7 @@ export const todoNotesSlice = createSlice({
             state.isCreating = false;
         },
         removeTodo: (state, action) => {
-            let newTodos = current(state.todos).filter((todo) => {
-                return todo.id !== action.payload.id;
-            });
+            const newTodos = _removeTodo(action.payload.id, state);
             state.todos = newTodos;
         },
         toggleStatus: (state, action) => {
@@ -45,9 +43,25 @@ export const todoNotesSlice = createSlice({
         openCreatingWindow: (state, action) => {
             state.isCreating = true;
             console.log(current(state));
+        },
+        toggleMode: (state, action) => {
+            state.todos = produce(state.todos, draft => {
+                let todoToChange = draft.find((todo) => todo.id === action.payload.id);
+                todoToChange.status = !todoToChange.status;
+            });
         }
     }
 });
+
+const _removeTodo = (id, state) => {
+    let output = current(state.todos).filter((todo) => {
+        return todo.id !== id;
+    })
+    return output;
+}
+
+
+
 
 export const selectAllTodos = (state) => {
     return state.todoNotes.todos;
@@ -61,6 +75,6 @@ export const getEmptyTodo = () => {
     return emptyTodo;
 }
 
-export const { addTodo, removeTodo, toggleStatus, openCreatingWindow } = todoNotesSlice.actions;
+export const { addTodo, removeTodo, toggleStatus, openCreatingWindow, toggleMode} = todoNotesSlice.actions;
 
 export default todoNotesSlice.reducer;
