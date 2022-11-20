@@ -1,4 +1,4 @@
-import createButton from "../img/circle-plus-solid.svg"
+import createButton from "../img/plus-solid.svg"
 
 export function CreateButton ({onClickHandler}) {
     return (
