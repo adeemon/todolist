@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"; 
-import { addTodo, removeTodo, toggleStatus, openCreatingWindow, selectAllTodos, selectIsCreating } from './todoNotesSlice';
+import { addTodo, removeTodo, toggleStatus, openCreatingWindow, selectAllTodos, selectIsCreating, toggleMode } from './todoNotesSlice';
 import { TodoNote } from "./TodoNote";
 import { CreateButton } from "../../components/CreateButton";
 import React, { useEffect } from 'react'
@@ -26,6 +26,10 @@ export const TodoNotes = () => {
         dispatch(openCreatingWindow());
     }
 
+    const onToggleModeHandler = (todo) => {
+        dispatch(toggleMode(todo));
+    }
+
     const listOfTodos = null || todoNotes.map((element) => 
     <TodoNote 
         id={element.id}
@@ -33,7 +37,8 @@ export const TodoNotes = () => {
         body={element.body}
         status={element.status}
         isFullMod={element.isFullMod}
-        onClickHandler={() => onRemoveTodoHandler(element)}
+        onRemoveHandler={() => onRemoveTodoHandler(element)}
+        onToggleModeHandler={() => onToggleModeHandler(element)}
     />);
     
 
