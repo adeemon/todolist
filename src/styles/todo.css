@@ -4,15 +4,16 @@
   z-index: 100;
   box-sizing: border-box;
 }
-.todo-note {
-  border: 2px solid green;
-}
 .not-displayed {
   display: none;
 }
 .button-icon {
   width: 80px;
   height: 80px;
+}
+.add-button .add-button__container {
+  border: 5px solid rgba(100, 74, 216, 0.1);
+  width: 100px;
 }
 .completed-bckg {
   background-color: rgba(35, 199, 29, 0.1);
@@ -22,8 +23,6 @@
 }
 .transparent-button {
   outline: none;
-  /* Для синий ободки */
-  border: 0;
   background: transparent;
 }
 .todo-list-container {
@@ -44,7 +43,7 @@
 }
 .todo-list-container .todo-note-container {
   padding: 5px;
-  border: 3px solid black;
+  border: 3px solid rgba(100, 74, 216, 0.1);
   border-radius: 8px;
   width: 100%;
   color: black;
