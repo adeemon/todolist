@@ -1,1 +1,88 @@
-@import url('./styles/todo.less');
+@import url("./styles/values.less");
+
+
+* {
+    margin: 0;
+    padding: 0;
+    z-index: 100;
+    box-sizing: border-box;
+    background-blend-mode: normal;
+  }
+  
+
+  .not-displayed {
+    display: none;
+  }
+
+  .button-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .completed-bckg {
+    background-color: @green-background;
+  }
+
+  .uncompleted-bckg {
+    background-color: @red-background;
+  }
+
+  .transparent-button {
+    outline: none;
+    border: 0;
+    background: transparent;
+  }
+
+.todo-list-container {
+    
+   min-height: 100vh;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: scroll;
+  background-color: @background;
+
+  .add-button {
+    float: right;
+    position: fixed;
+    max-width: 80px;
+    max-height: 80px;
+    top: 85%;
+    right: 10%;
+    overflow-anchor: none;
+    border: 5px solid @border-color;
+    border-radius: 100%;
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .todo-note-container{
+    padding: 5px;
+    border: 3px solid @border-color;
+    border-radius: 8px;
+    width: 100%;
+    color: black;
+    margin-bottom: 1%;
+
+    .delete-button {
+      width: 80px;
+      height: 80px;
+      background-color: none;
+      align-self: flex-end;
+    }
+
+    .id, .title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .todo-note-short{
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
