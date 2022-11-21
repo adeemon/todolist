@@ -2,17 +2,15 @@ import { useForm } from "react-hook-form";
 import { addTodo, toggleCreatingWindow, updateTodo } from "../features/todoNote/todoNotesSlice";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+import dayjs from "dayjs";
 
 export function EditWindow ({id, title, dateOfNote, time, body, status}) {
     const dispatch = useDispatch();
     let isSaved = false;
     const onSaveHandler = (newTodo) => {
         if (title) {
-            isSaved = true;
-            console.log(newTodo);
             dispatch(updateTodo(newTodo));
         } else {
-            isSaved = true;
             dispatch(addTodo(newTodo));
         }
     }
@@ -29,8 +27,10 @@ export function EditWindow ({id, title, dateOfNote, time, body, status}) {
 
     const statusToRener = status ? "Выполнено" : "Не выполнено"
     const onSubmit = (data) => {
+        isSaved = true;
         let {title, status, body} = data;
-        let date = data.dueDate + " " + data.dueTime;
+        let dateFormated = dayjs(data.dueDate).format('YYYY-MM-DD');
+        let date = dateFormated + " " + data.dueTime;
         status = status === "true" ? true : false;
         dispatch(toggleCreatingWindow());
         onSaveHandler({title, status, 

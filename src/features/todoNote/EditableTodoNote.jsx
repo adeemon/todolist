@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 
 export function EditableTodoNote({id, title, date, body, status, closeClickHandler}) {
     const dispatch = useDispatch();
-    let dateOfNote = dayjs(date).format('DD-MM-YYYY');
+    let dateOfNote = dayjs(date).format('YYYY-MM-DD');
     let timeOfNote = dayjs(date).format('HH:mm');
 
     console.log(dateOfNote + ' ' + timeOfNote)

@@ -36,20 +36,18 @@ export const todoNotesSlice = createSlice({
         addTodo: (state, action) => {
             action.payload.id = _getId(state);
             action.payload.isFullMode = false;
-            console.log(action.payload);
             state.todos.unshift(action.payload);
             state.isCreating = false;
         },
         updateTodo: (state, action) => {
             let buf = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
-                console.log(todoToChange)
                 todoToChange.id = action.payload.id;
                 todoToChange.title = action.payload.title;
                 todoToChange.body = action.payload.body;
                 todoToChange.status = action.payload.status;
+                todoToChange.date = action.payload.date;
                 todoToChange.isFullMode = false;
-                console.log(current(todoToChange));
             });
             state.todos = buf;
             state.isCreating = false;
@@ -73,8 +71,6 @@ export const todoNotesSlice = createSlice({
         },
         toggleCreatingWindow: (state) => {
             state.isCreating = !state.isCreating;
-            console.log('Toggled!')
-            console.log('Now is creating is ' + (state.isCreating));
         }
     }
 });
