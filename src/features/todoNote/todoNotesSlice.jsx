@@ -40,18 +40,23 @@ export const todoNotesSlice = createSlice({
             state.todos.unshift(action.payload);
             state.isCreating = false;
         },
+        updateTodo: (state, action) => {
+            let buf = produce(state.todos, draft => {
+                let todoToChange = draft.find((todo) => todo.id === action.payload.id);
+                console.log(todoToChange)
+                todoToChange.id = action.payload.id;
+                todoToChange.title = action.payload.title;
+                todoToChange.body = action.payload.body;
+                todoToChange.status = action.payload.status;
+                todoToChange.isFullMode = false;
+                console.log(current(todoToChange));
+            });
+            state.todos = buf;
+            state.isCreating = false;
+        },
         removeTodo: (state, action) => {
             const newTodos = _removeTodo(action.payload.id, state);
             state.todos = newTodos;
-        },
-        toggleStatus: (state, action) => {
-            console.log(state);
-        },
-        openCreatingWindow: (state, action) => {
-            state.isCreating = true;
-        },
-        closeCreatingWindow: (state) => {
-            state.isCreating = false;
         },
         toggleMode: (state, action) => {
             state.todos = produce(state.todos, draft => {
@@ -60,12 +65,17 @@ export const todoNotesSlice = createSlice({
             });
         },
         toggleFullMode: (state, action) => {
+            const isClosed = false;
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload);
                 todoToChange.isFullMode = !todoToChange.isFullMode;
             });
+        },
+        toggleCreatingWindow: (state) => {
+            state.isCreating = !state.isCreating;
+            console.log('Toggled!')
+            console.log('Now is creating is ' + (state.isCreating));
         }
-
     }
 });
 
@@ -74,6 +84,14 @@ const _removeTodo = (id, state) => {
         return todo.id !== id;
     })
     return output;
+}
+
+const _setAllTodoToShort = (state) => {
+    produce(state.todos, draft => {
+        draft.forEach(element => {
+            element.isFullMode = false;
+        });
+    })
 }
 
 const _getId = (state) => {
@@ -92,8 +110,8 @@ export const getEmptyTodo = () => {
     return emptyTodo;
 }
 
-export const { addTodo, removeTodo, toggleStatus, openCreatingWindow, 
-    toggleMode, closeCreatingWindow, 
-    toggleFullMode} = todoNotesSlice.actions;
+export const { addTodo, removeTodo, 
+    toggleMode, toggleCreatingWindow,
+    toggleFullMode, updateTodo} = todoNotesSlice.actions;
 
 export default todoNotesSlice.reducer;

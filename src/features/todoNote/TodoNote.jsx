@@ -24,8 +24,6 @@ export function TodoNote ({id, title, date, body, status, isFullMode, onRemoveHa
     const onEditHandler = (id) => {
         dispatch(toggleFullMode(id));
     }
-
-    if (isFullMode === false) {
         return (
             <div className={todoClassName} >
                 {isFullMode ? "kekw" : 
@@ -36,5 +34,4 @@ export function TodoNote ({id, title, date, body, status, isFullMode, onRemoveHa
                 onEditHandler={() => onEditHandler(id)}/>}
             </div>
         )
-    }
 }
