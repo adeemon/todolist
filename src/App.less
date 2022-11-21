@@ -4,10 +4,13 @@
 * {
     margin: 0;
     padding: 0;
-    z-index: 100;
+    z-index: 0;
     box-sizing: border-box;
     background-blend-mode: normal;
+    list-style-type: none;
   }
+
+
   
 
   .not-displayed {
@@ -27,6 +30,10 @@
     background-color: @red-background;
   }
 
+  .overdue-bckg {
+    background-color: @turquoise-background;
+  }
+
   .transparent-button {
     outline: none;
     border: 0;
@@ -34,7 +41,8 @@
   }
 
 .todo-list-container {
-    
+  position: relative;
+  z-index: 1;
    min-height: 100vh;
   width: auto;
   display: flex;
@@ -66,12 +74,23 @@
     width: 100%;
     color: black;
     margin-bottom: 1%;
-
+    .title {
+      min-width: 60%;
+    }
+    .toggler-button {
+      width: 100px;
+    }
     .delete-button {
       width: 80px;
       height: 80px;
       background-color: none;
       align-self: flex-end;
+    }
+
+    .date {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .id, .title {
@@ -84,5 +103,54 @@
       display: flex;
       justify-content: space-between;
     }
+  }
+}
+
+.edit-window__container {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  padding: 5px;
+  input, div, select, textarea {
+    margin: 2px;
+    border-radius: 8px;
+  }
+
+  .edit-window__title-and-status-container {
+    display: flex;
+    justify-content: space-between;
+
+    .edit-window__title {
+      padding: 5px;
+      min-width: 65%;
+    }
+    .edit-window__status {
+      max-width: 10%;
+    }
+    ul {
+      li {
+        input {
+          width: 100%;
+        }
+      }
+    }
+  }
+  .edit-window__body {
+    border: 3px solid @border-color;
+    min-width: 98%;
+    min-height: 100%;
+    padding: 2px;
+  }
+
+  .edit-window__body-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 40%;
+    max-height: 60%;
   }
 }
