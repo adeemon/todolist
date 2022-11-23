@@ -29,7 +29,7 @@ export const todoNotesSlice = createSlice({
                 status: true,
                 body: 'lololol',
                 isFullMode: false,
-                files: []
+                files: ['1x.png']
             }
         ],
         isCreating: false,
@@ -49,10 +49,8 @@ export const todoNotesSlice = createSlice({
                 todoToChange.body = action.payload.body;
                 todoToChange.status = action.payload.status;
                 todoToChange.date = action.payload.date;
-                todoToChange.isFullMode = false;
             });
             state.todos = buf;
-            state.isCreating = false;
         },
         removeTodo: (state, action) => {
             const newTodos = _removeTodo(action.payload.id, state);
@@ -65,15 +63,25 @@ export const todoNotesSlice = createSlice({
             });
         },
         toggleFullMode: (state, action) => {
-            const isClosed = false;
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload);
-                todoToChange.isFullMode = !todoToChange.isFullMode;
+                if (todoToChange?.hasOwnProperty('isFullMode')) {
+                    todoToChange.isFullMode = !todoToChange.isFullMode;
+                }
             });
+            state.isCreating = false;
+            console.log(current(state));
         },
         toggleCreatingWindow: (state) => {
             state.isCreating = !state.isCreating;
-        }
+        },
+        removeFileFromTodo: (state, action) => {
+            state.todos = produce(state.todos, draft => {
+                console.log('delete');
+                console.log(action.payload);
+                let todoToChange = draft.find((todo) => todo.id === action.payload.id);
+                todoToChange.files = todoToChange.files?.filter((element) => element != action.payload.fileName)})
+        }         
     }
 });
 
@@ -110,6 +118,6 @@ export const getEmptyTodo = () => {
 
 export const { addTodo, removeTodo, 
     toggleMode, toggleCreatingWindow,
-    toggleFullMode, updateTodo} = todoNotesSlice.actions;
+    toggleFullMode, updateTodo, removeFileFromTodo} = todoNotesSlice.actions;
 
 export default todoNotesSlice.reducer;

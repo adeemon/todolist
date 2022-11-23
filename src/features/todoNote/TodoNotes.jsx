@@ -6,17 +6,13 @@ import React, { useEffect } from 'react'
 import { EditWindow } from "../../components/EditWindow";
 import { Modal } from "../../components/Modal/Modal";
 import { EditableTodoNote } from "./EditableTodoNote";
-import { firebase } from "../../firebase/firebase";
-import { getStorage, ref } from "firebase/storage";
-import { downloadFile } from "../../utility/fileLoader";
-import { FileDownloadLink } from "../../components/FileDownloadLink/FileDownloadLink";
+
 
 export const TodoNotes = () => {
     const dispatch = useDispatch();
     const todoNotes = useSelector(selectAllTodos);
     const isCreating = useSelector(selectIsCreating);
     let noteToEdit;
-    let link;
 
     const onRemoveTodoHandler = (todo) =>{
         dispatch(removeTodo(todo))

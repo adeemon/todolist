@@ -1,61 +1,23 @@
 import { useForm } from "react-hook-form";
-import { addTodo, toggleCreatingWindow, updateTodo } from "../features/todoNote/todoNotesSlice";
+import { addTodo, removeFileFromTodo, toggleCreatingWindow, updateTodo, toggleFullMode } from "../features/todoNote/todoNotesSlice";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { DragDropField } from "./DragDropField/DragDropField";
 import dayjs from "dayjs";
-import { FileDownloadLink } from "./FileDownloadLink/FileDownloadLink";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { firebase } from "../firebase/firebase";
-
-const useFetch = (filesArray) => {
-    const [links, setLinks] = useState({});
-    const [loading, setLoading] = useState(true);
-      
-    useEffect(() => {
-        fetchUser();
-    });
-
-    const fetchUser = () => {
-        let outLinks = {};
-        filesArray?.forEach((element) => {
-            async function fetchData() {
-                const storage = getStorage(firebase);
-                const starsRef = ref(storage, "/" + element);
-                const result = await getDownloadURL(starsRef);
-                const key = String(element);
-                outLinks[key] = result;
-                const output = {};
-                output[key] = result;
-                setLinks((prev) => {
-                    return Object.assign(prev, output);
-                });
-                setLoading(false);
-            }
-            fetchData();
-        })
-        
-        if (filesArray?.length == 0) {
-            setLoading(false);
-        }
-    };
-    return { links, loading };
-  };
-
+import { FileFirebaseDownloadLink } from "./FileFirebaseDownloadLink/FileFirebaseDownloadLink";
 
 export function EditWindow ({id, title, dateOfNote, time, body, status, files}) {
     const dispatch = useDispatch();
-    const {links, loading} = useFetch(files);
-    let isSaved = false;
+    let [isClosed, setIsClosed] = useState(true);
     const statusToRener = status ? "Выполнено" : "Не выполнено";
     const { register, handleSubmit, reset } = useForm();
 
     useEffect(()=> {
-        console.log('render');
         return ()=>{
-            if (!isSaved && title) {
-                let date = dateOfNote + " " + time;
-                dispatch(updateTodo({id, title, date, body,status}));
+            console.log('attempt to dismount');
+            if (isClosed) {
+                console.log('toggle of mode')
+                dispatch(toggleFullMode(id));
             }
         }
     },[]);
@@ -69,13 +31,15 @@ export function EditWindow ({id, title, dateOfNote, time, body, status, files}) 
     }
 
     const onSubmit = (data) => {
+        setIsClosed(false);
+        console.log('submit!');
         let {title, status, body} = data;
         let dateFormated = data.dueDate ? dayjs(data.dueDate).format('YYYY-MM-DD') : null;
         let date = dateFormated ? dateFormated + " " + data.dueTime : "";
         status = status === "true" ? true : false;
-        dispatch(toggleCreatingWindow());
         onSaveHandler({title, status, 
         body, date, id});
+        dispatch(toggleFullMode(id));
         reset({
             id: null,
             title: null,
@@ -86,26 +50,26 @@ export function EditWindow ({id, title, dateOfNote, time, body, status, files}) 
         });
     }
 
+    const onRemoveFileHandler = (fileName) => {
+        setIsClosed(false);
+        let props = {};
+        props.id = id;
+        props.fileName = fileName;
+        dispatch(removeFileFromTodo(props));
+    }
+
     const getFileLinks = () => {
-        console.log(Object.values(links)?.length, 'links length');
-        console.log(files?.length, 'files length');
         let fileLinks = files?.map(element => {
-            if (links[element]) {
-                console.log(element, 'element');
-                console.log('link', links[element]);
-                return <FileDownloadLink fileName={element} fileLink={links[element]} />
-            }
-        });
-        
-        console.log(fileLinks, 'file links');
+                return <FileFirebaseDownloadLink 
+                    fileName={element} 
+                    onDeleteHandler={() => onRemoveFileHandler(element)}
+                    />
+        });        
         return fileLinks;
     }
 
     return (
-        <div>
-            {links?.length < files?.length && title ? (<div>Loading</div>) : 
-            (
-                <form className="edit-window__container" onSubmit={handleSubmit(onSubmit)}>
+            <form className="edit-window__container" onSubmit={handleSubmit(onSubmit)}>
                 <div className="edit-window__title-and-status-container">
                     <input className="edit-window__title"
                         {...register("title", { required: true })} 
@@ -130,10 +94,8 @@ export function EditWindow ({id, title, dateOfNote, time, body, status, files}) 
                     {getFileLinks()}
                 </div>
                 <div className="edit-window__buttons">
-                <input type="submit" />
+                    <input type="submit" />
                 </div>  
             </form>
-            )}
-        </div>
     );
 }
