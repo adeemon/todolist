@@ -1,20 +1,15 @@
-import { Modal } from "../../components/Modal/Modal";
 import { EditWindow } from "../../components/EditWindow";
-import { toggleFullMode } from "./todoNotesSlice";
 import dayjs from "dayjs";
-import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
-export function EditableTodoNote({id, title, date, body, status, closeClickHandler}) {
-    const dispatch = useDispatch();
-    let dateOfNote = dayjs(date).format('YYYY-MM-DD');
-    let timeOfNote = dayjs(date).format('HH:mm');
+export function EditableTodoNote({id, title, date, body, status, files}) {
+    let dateOfNote = null;
+    let timeOfNote = null;
 
     console.log(dateOfNote + ' ' + timeOfNote)
     return (
-        <Modal active={true} closeClickHandler={closeClickHandler} child={
-            <EditWindow id={id} title={title} dateOfNote={dateOfNote} 
-            time={timeOfNote} body={body}
-            status={status} />
-        } />
+        <EditWindow id={id} title={title} dateOfNote={dateOfNote} 
+        time={timeOfNote} body={body}
+        status={status} files={files}/>
     )
 }

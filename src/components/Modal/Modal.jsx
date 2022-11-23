@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./modal.css"
 
 export function Modal({active, closeClickHandler, child}) {

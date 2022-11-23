@@ -6,16 +6,17 @@ import React, { useEffect } from 'react'
 import { EditWindow } from "../../components/EditWindow";
 import { Modal } from "../../components/Modal/Modal";
 import { EditableTodoNote } from "./EditableTodoNote";
+import { firebase } from "../../firebase/firebase";
+import { getStorage, ref } from "firebase/storage";
+import { downloadFile } from "../../utility/fileLoader";
+import { FileDownloadLink } from "../../components/FileDownloadLink/FileDownloadLink";
 
 export const TodoNotes = () => {
     const dispatch = useDispatch();
     const todoNotes = useSelector(selectAllTodos);
     const isCreating = useSelector(selectIsCreating);
     let noteToEdit;
-
-    useEffect(()=> {
-        console.log('Render!');
-    })
+    let link;
 
     const onRemoveTodoHandler = (todo) =>{
         dispatch(removeTodo(todo))
@@ -26,7 +27,6 @@ export const TodoNotes = () => {
     }
 
     const onToggleCreatingWindow = () => {
-        console.log('Toggled!');
         dispatch(toggleCreatingWindow());
     }
 
@@ -38,6 +38,7 @@ export const TodoNotes = () => {
             title={element.title}
             body={element.body}
             status={element.status}
+            files={element.files}
             closeClickHandler={onToggleCreatingWindow}
         />
     } else return <TodoNote 
@@ -47,21 +48,25 @@ export const TodoNotes = () => {
         body={element.body}
         status={element.status}
         isFullMode={element.isFullMode}
+        files={element.files}
         onRemoveHandler={() => onRemoveTodoHandler(element)}
         onToggleModeHandler={() => onToggleModeHandler(element)}
     />
     });
 
+    const newTodoWindow = <EditWindow id={null} title={null}
+    dateOfNote={null} body={null} status={null} onSaveClickHandler={null} 
+    onCloseClickHandler={null} onToggleStatusHandler={null} files={null}/> 
+
+    const modalContent = noteToEdit ? noteToEdit : newTodoWindow;
+
     return (
         <div className="todo-list-container" >
             {listOfTodos ? listOfTodos : 'Loading!'}
             <CreateButton onClickHandler={onToggleCreatingWindow} />
-            <Modal active={isCreating} closeClickHandler={onToggleCreatingWindow} child={
-                <EditWindow id={null} title={null}
-                dateOfNote={null} body={null} status={null} onSaveClickHandler={null} 
-                onCloseClickHandler={null} onToggleStatusHandler={null} /> 
-            } />
-            {noteToEdit}
+            { isCreating || noteToEdit 
+                ? <Modal active={true} closeClickHandler={onToggleCreatingWindow} child={modalContent} />
+                : null}
         </div>
     )
 }

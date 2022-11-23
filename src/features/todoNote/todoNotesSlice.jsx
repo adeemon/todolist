@@ -20,6 +20,7 @@ export const todoNotesSlice = createSlice({
                 status: false,
                 body: 'lololol',
                 isFullMode: false,
+                files: ['3x.png', '1x.png']
             },
             {
                 id: 2,
@@ -28,6 +29,7 @@ export const todoNotesSlice = createSlice({
                 status: true,
                 body: 'lololol',
                 isFullMode: false,
+                files: []
             }
         ],
         isCreating: false,
