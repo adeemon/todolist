@@ -1,13 +1,13 @@
 import dayjs from "dayjs"
 
 import { useEffect } from "react"
-import { DeleteButton } from "../../components/DeleteButton"
-import { Toggler } from "../../components/Toggler"
+import { DeleteButton } from "../../components/DeleteButton/DeleteButton"
+import { Toggler } from "../../components/Toggler/Toggler"
 
 export const TodoNoteShort = ({id, title, date, status, onToggleModeHandler, onRemoveHandler, onEditHandler}) => {
     let togglerContent = !status ? 'Выполнено!' : 'Не выполнено!'
-    const dateParsed = date.slice(0, 10);
-    const timeParsed = date.slice(11, 16);
+    const dateParsed = date?.slice(0, 10);
+    const timeParsed = date?.slice(11, 16);
     
 
     return (

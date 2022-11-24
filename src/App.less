@@ -1,7 +1,7 @@
-@import url("./styles/values.less");
+@import url("./styles/todos/values.less");
 
 
-* {
+  * {
     margin: 0;
     padding: 0;
     z-index: 0;
@@ -9,9 +9,6 @@
     background-blend-mode: normal;
     list-style-type: none;
   }
-
-
-  
 
   .not-displayed {
     display: none;
@@ -39,118 +36,3 @@
     border: 0;
     background: transparent;
   }
-
-.todo-list-container {
-  position: relative;
-  z-index: 1;
-   min-height: 100vh;
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: scroll;
-  background-color: @background;
-
-  .add-button {
-    float: right;
-    position: fixed;
-    max-width: 80px;
-    max-height: 80px;
-    top: 85%;
-    right: 10%;
-    overflow-anchor: none;
-    border: 5px solid @border-color;
-    border-radius: 100%;
-    width: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .todo-note-container{
-    padding: 5px;
-    border: 3px solid @border-color;
-    border-radius: 8px;
-    width: 100%;
-    color: black;
-    margin-bottom: 1%;
-    .title {
-      min-width: 60%;
-    }
-    .toggler-button {
-      width: 100px;
-    }
-    .delete-button {
-      width: 80px;
-      height: 80px;
-      background-color: none;
-      align-self: flex-end;
-    }
-
-    .date {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .id, .title {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .todo-note-short{
-      display: flex;
-      justify-content: space-between;
-    }
-  }
-}
-
-.edit-window__container {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  padding: 5px;
-  input, div, select, textarea {
-    margin: 2px;
-    border-radius: 8px;
-  }
-
-  .edit-window__title-and-status-container {
-    display: flex;
-    justify-content: space-between;
-
-    .edit-window__title {
-      padding: 5px;
-      min-width: 65%;
-    }
-    .edit-window__status {
-      max-width: 10%;
-    }
-    ul {
-      li {
-        input {
-          width: 100%;
-        }
-      }
-    }
-  }
-  .edit-window__body {
-    border: 3px solid @border-color;
-    min-width: 98%;
-    min-height: 100%;
-    padding: 2px;
-  }
-
-  .edit-window__body-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 40%;
-    max-height: 60%;
-  }
-}

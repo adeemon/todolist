@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { firebase } from "../../firebase/firebase"
-import { DeleteButton } from "../DeleteButton";
+import { DeleteButton } from "../DeleteButton/DeleteButton";
 
 export const FileFirebaseDownloadLink = ({fileName, onDeleteHandler}) => {
     const storage = getStorage(firebase);

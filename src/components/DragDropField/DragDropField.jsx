@@ -1,8 +1,15 @@
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useState } from "react"
+import { useDispatch } from "react-redux";
+import { addFile, getId } from "../../features/todoNote/todoNotesSlice";
+import { firebase } from "../../firebase/firebase";
 import "./dragDropField.css"
 
-export const DragDropField = ({onSaveHandler}) => {
+export const DragDropField = ({id}) => {
+    const dispatch = useDispatch();
+    const storage = getStorage(firebase);
     const [drag, setDrag] = useState(false);
+
     const dragStartHandler = (e) => {
         e.preventDefault();
         setDrag(true);
@@ -13,8 +20,19 @@ export const DragDropField = ({onSaveHandler}) => {
         setDrag(false);
     }
     const onDropHandler = (e) => {
-        console.log(e.dataTransfer.files);
         e.preventDefault();
+        let files = [...e.dataTransfer.files];
+        files.forEach((file) => {
+            const storageRef = ref(storage, '/' + file.name);
+            uploadBytes(storageRef, file).then(() => {
+                const fileName = file.name;
+                 onSaveHandler({id, fileName})
+            })
+        })
+    }
+
+    const onSaveHandler = (fileName, id) => {
+        dispatch(addFile(fileName, id))
     }
     return (
         <div className="drag-drop">

@@ -1,4 +1,4 @@
-import { EditWindow } from "../../components/EditWindow";
+import { EditWindow } from "../../components/EditWindow/EditWindow";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 

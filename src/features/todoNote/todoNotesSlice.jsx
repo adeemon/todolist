@@ -1,13 +1,17 @@
 import { createSlice, current } from "@reduxjs/toolkit";
 import produce from "immer"
 import dayjs from 'dayjs'
+import { firebase } from "../../firebase/firebase";
+import { getStorage, listAll, ref, uploadBytes } from "firebase/storage";
 
-const emptyTodo = {
+export const emptyTodoTemplate = {
     id: 0,
     title: '',
-    status: 'false',
+    status: false,
     body: '',
-    isFullMode: 'true'
+    isFullMode: true,
+    files: [],
+    isCompleted: false
 }
 
 export const todoNotesSlice = createSlice({
@@ -20,7 +24,8 @@ export const todoNotesSlice = createSlice({
                 status: false,
                 body: 'lololol',
                 isFullMode: false,
-                files: ['3x.png', '1x.png']
+                files: ['3x.png', '1x.png'],
+                isCompleted: true
             },
             {
                 id: 2,
@@ -29,17 +34,23 @@ export const todoNotesSlice = createSlice({
                 status: true,
                 body: 'lololol',
                 isFullMode: false,
-                files: ['1x.png']
-            }
+                files: ['1x.png'],
+                isCompleted: true
+            },
         ],
-        isCreating: false,
     },
     reducers: {
-        addTodo: (state, action) => {
-            action.payload.id = _getId(state);
-            action.payload.isFullMode = false;
-            state.todos.unshift(action.payload);
-            state.isCreating = false;
+        addEmptyTodo: (state, action) => {
+            let newTodo = {}
+            newTodo.id = action.payload;
+            newTodo.date = "";
+            newTodo.title = "";
+            newTodo.status = false;
+            newTodo.body = "";
+            newTodo.isFullMode = true;
+            newTodo.files = [];
+            newTodo.isCompleted = false;
+            state.todos.unshift(newTodo);
         },
         updateTodo: (state, action) => {
             let buf = produce(state.todos, draft => {
@@ -49,8 +60,10 @@ export const todoNotesSlice = createSlice({
                 todoToChange.body = action.payload.body;
                 todoToChange.status = action.payload.status;
                 todoToChange.date = action.payload.date;
+                todoToChange.isCompleted = true;
             });
             state.todos = buf;
+            saveTodos(state);
         },
         removeTodo: (state, action) => {
             const newTodos = _removeTodo(action.payload.id, state);
@@ -69,19 +82,38 @@ export const todoNotesSlice = createSlice({
                     todoToChange.isFullMode = !todoToChange.isFullMode;
                 }
             });
-            state.isCreating = false;
-            console.log(current(state));
-        },
-        toggleCreatingWindow: (state) => {
-            state.isCreating = !state.isCreating;
         },
         removeFileFromTodo: (state, action) => {
             state.todos = produce(state.todos, draft => {
-                console.log('delete');
-                console.log(action.payload);
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
                 todoToChange.files = todoToChange.files?.filter((element) => element != action.payload.fileName)})
-        }         
+        },
+        closeCreatingWindow: (state) => {
+            state.todos = produce(state.todos, draft => {
+                draft.forEach((todo) => todo.isFullMode = false);
+            })
+        },
+        addFile: (state, action) => {
+            state.todos = produce(state.todos, draft => {
+                let todoToChange = draft.find((todo) => todo.id === action.payload.id);
+                if (!todoToChange) {
+                    todoToChange = {
+                        id: 0,
+                        title: '',
+                        status: 'false',
+                        body: '',
+                        isFullMode: true};
+                    todoToChange.id = action.payload.id;
+                    todoToChange.isCompleted = false;
+                    todoToChange.files = [];
+                    state.todos.unshift(todoToChange);
+                }
+                todoToChange.files.push(action.payload.fileName)
+            })
+        },
+        clearUncompleted: (state) => {
+            state.todos = state.todos.filter((todo) => todo.isCompleted);
+        }       
     }
 });
 
@@ -92,15 +124,7 @@ const _removeTodo = (id, state) => {
     return output;
 }
 
-const _setAllTodoToShort = (state) => {
-    produce(state.todos, draft => {
-        draft.forEach(element => {
-            element.isFullMode = false;
-        });
-    })
-}
-
-const _getId = (state) => {
+export const getId = (state) => {
     return current(state.todos).length + 1;
 }
 
@@ -112,12 +136,32 @@ export const selectIsCreating = (state) => {
     return state.todoNotes.isCreating;
 }
 
-export const getEmptyTodo = () => {
-    return emptyTodo;
+const saveTodos = (state) => {
+    console.log(current(state));
+    const storage = getStorage(firebase);
+    const todos = current(state).todos;
+    let storageFolder = "/todos/"
+    todos.forEach(todoObj => {
+        const path = storageFolder + todoObj.id + ".txt"
+        const storageRef = ref(storage, path);
+        const blob = new Blob([JSON.stringify(todoObj, null, 2)], {type : 'text/plain'});
+        uploadBytes(storageRef, blob).then(() => {
+            console.log(blob);
+        })
+    })
 }
+
+const getInitTodos = (state) => {
+    const storage = getStorage(firebase);
+    const storageRef = ref(storage, "/todos/")
+    listAll(storageRef).then((res) => console.log(res.items));
+}
+
 
 export const { addTodo, removeTodo, 
     toggleMode, toggleCreatingWindow,
-    toggleFullMode, updateTodo, removeFileFromTodo} = todoNotesSlice.actions;
+    toggleFullMode, updateTodo,
+    removeFileFromTodo, closeCreatingWindow,
+    addFile, clearUncompleted,addEmptyTodo  } = todoNotesSlice.actions;
 
 export default todoNotesSlice.reducer;
