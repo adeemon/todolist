@@ -2,44 +2,48 @@ import { createSlice, current } from "@reduxjs/toolkit";
 import produce from "immer"
 import dayjs from 'dayjs'
 import { firebase } from "../../firebase/firebase";
-import { getStorage, listAll, ref, uploadBytes } from "firebase/storage";
+import { getStorage, listAll, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { removeTodoFromStorage } from "../../utility/fileLoader";
 
-export const emptyTodoTemplate = {
-    id: 0,
-    title: '',
-    status: false,
-    body: '',
-    isFullMode: true,
-    files: [],
-    isCompleted: false
+
+const storage = getStorage(firebase);
+const storageRef = ref(storage, "/todos/")
+
+
+const saveTodos = (state) => {
+    const todos = current(state).todos;
+    let storageFolder = "/todos/"
+    todos.forEach(todoObj => {
+        const path = storageFolder + todoObj.id + ".txt"
+        const storageRef = ref(storage, path);
+        const blob = new Blob([JSON.stringify(todoObj, null, 2)], {type : 'text/plain'});
+        uploadBytes(storageRef, blob).then(() => {
+            console.log(blob);
+        })
+    })
 }
+
 
 export const todoNotesSlice = createSlice({
     name: 'todoNotes',
     initialState: {
-        todos: [{
-                id: 1,
-                date: '2018-04-13 19:18',
-                title: 'kekwait',
-                status: false,
-                body: 'lololol',
-                isFullMode: false,
-                files: ['3x.png', '1x.png'],
-                isCompleted: true
-            },
-            {
-                id: 2,
-                date: '2024-04-13 19:18',
-                title: 'kekwaitof',
-                status: true,
-                body: 'lololol',
-                isFullMode: false,
-                files: ['1x.png'],
-                isCompleted: true
-            },
-        ],
+        todos: [],
     },
     reducers: {
+        /**
+         * Замещает все todo в store на полученные из
+         * action.
+         * @param {state} state 
+         * @param {[todoObj]} action массив объектов todo
+         */
+        setTodos: (state, action) => {
+            state.todos = action.payload;
+        },
+        /**
+         * Добавляет пустую задачу с указанным id в store
+         * @param {state} state 
+         * @param {number} action id задачи
+         */
         addEmptyTodo: (state, action) => {
             let newTodo = {}
             newTodo.id = action.payload;
@@ -52,6 +56,11 @@ export const todoNotesSlice = createSlice({
             newTodo.isCompleted = false;
             state.todos.unshift(newTodo);
         },
+        /**
+         * Обновляет задачу в store, также помечая её как корректно заполненную.
+         * @param {state} state 
+         * @param {todoObj} action новые данные для задачи
+         */
         updateTodo: (state, action) => {
             let buf = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
@@ -65,16 +74,31 @@ export const todoNotesSlice = createSlice({
             state.todos = buf;
             saveTodos(state);
         },
+        /**
+         * Удаляет задачу с указанным id.
+         * @param {state} state 
+         * @param {number} action id задачи.
+         */
         removeTodo: (state, action) => {
             const newTodos = _removeTodo(action.payload.id, state);
             state.todos = newTodos;
         },
+        /**
+         * Изменяет статус выполнения задачи на противоположный.
+         * @param {state} state 
+         * @param {todoObj} action объект задачи, обязательно содержащий id.
+         */
         toggleMode: (state, action) => {
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
                 todoToChange.status = !todoToChange.status;
             });
         },
+        /**
+         * Открывает задачу как доступную к редактированию.
+         * @param {stete} state 
+         * @param {number} action id задачи
+         */
         toggleFullMode: (state, action) => {
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload);
@@ -83,85 +107,74 @@ export const todoNotesSlice = createSlice({
                 }
             });
         },
+        /**
+         * Удаляет файл из задачи
+         * @param {state} state 
+         * @param {{string, number}} action объект, содержащий id задачи и fileName название файла.
+         */
         removeFileFromTodo: (state, action) => {
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
                 todoToChange.files = todoToChange.files?.filter((element) => element != action.payload.fileName)})
         },
+        /**
+         * Закрывает окно просмотра для всех записей.
+         * @param {*} state 
+         */
         closeCreatingWindow: (state) => {
             state.todos = produce(state.todos, draft => {
                 draft.forEach((todo) => todo.isFullMode = false);
             })
         },
+        /**
+         * Добавляет файл к задаче.
+         * @param {*} state 
+         * @param {string} action название файла.
+         */
         addFile: (state, action) => {
             state.todos = produce(state.todos, draft => {
                 let todoToChange = draft.find((todo) => todo.id === action.payload.id);
-                if (!todoToChange) {
-                    todoToChange = {
-                        id: 0,
-                        title: '',
-                        status: 'false',
-                        body: '',
-                        isFullMode: true};
-                    todoToChange.id = action.payload.id;
-                    todoToChange.isCompleted = false;
-                    todoToChange.files = [];
-                    state.todos.unshift(todoToChange);
-                }
                 todoToChange.files.push(action.payload.fileName)
             })
         },
+        /**
+         * Удаляет все незаполненные (isCompleted = false) записи.
+         * @param {*} state 
+         */
         clearUncompleted: (state) => {
             state.todos = state.todos.filter((todo) => todo.isCompleted);
         }       
     }
 });
 
+/**
+ * Вспомогательная функция, удаляющая запись из хранилища
+ * @param {number} id записи, подлежащей удалению.
+ * @param {state} state хранилище, из которого запись будет удалена.
+ * @returns 
+ */
 const _removeTodo = (id, state) => {
     let output = current(state.todos).filter((todo) => {
         return todo.id !== id;
     })
+    removeTodoFromStorage(id);
     return output;
 }
 
-export const getId = (state) => {
-    return current(state.todos).length + 1;
-}
-
+/**
+ * Возвращает все задачи. Небоходима для useSelector.
+ * @param {*} state 
+ * @returns массив задач.
+ */
 export const selectAllTodos = (state) => {
+    console.log((state), 'state')
     return state.todoNotes.todos;
 }
-
-export const selectIsCreating = (state) => {
-    return state.todoNotes.isCreating;
-}
-
-const saveTodos = (state) => {
-    console.log(current(state));
-    const storage = getStorage(firebase);
-    const todos = current(state).todos;
-    let storageFolder = "/todos/"
-    todos.forEach(todoObj => {
-        const path = storageFolder + todoObj.id + ".txt"
-        const storageRef = ref(storage, path);
-        const blob = new Blob([JSON.stringify(todoObj, null, 2)], {type : 'text/plain'});
-        uploadBytes(storageRef, blob).then(() => {
-            console.log(blob);
-        })
-    })
-}
-
-const getInitTodos = (state) => {
-    const storage = getStorage(firebase);
-    const storageRef = ref(storage, "/todos/")
-    listAll(storageRef).then((res) => console.log(res.items));
-}
-
 
 export const { addTodo, removeTodo, 
     toggleMode, toggleCreatingWindow,
     toggleFullMode, updateTodo,
     removeFileFromTodo, closeCreatingWindow,
-    addFile, clearUncompleted,addEmptyTodo  } = todoNotesSlice.actions;
+    addFile, clearUncompleted,addEmptyTodo, setTodos } = todoNotesSlice.actions;
 
 export default todoNotesSlice.reducer;

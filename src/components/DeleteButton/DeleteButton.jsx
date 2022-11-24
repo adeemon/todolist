@@ -1,5 +1,10 @@
 import deleteButton from "../../img/delete.png";
 
+/**
+ * Компонент, отображающий кнопку удаления.
+ * @param {function} function 
+ * @returns 
+ */
 export function DeleteButton ({onClickHandler}) {
     return (
         <div className="transparent-button">

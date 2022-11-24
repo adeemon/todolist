@@ -1,8 +1,11 @@
 import { EditWindow } from "../../components/EditWindow/EditWindow";
-import dayjs from "dayjs";
-import { useEffect } from "react";
 
-export function EditableTodoNote({id, title, date, body, status, files}) {
+/**
+ * Контейнер для окна редактирования записи.
+ * @param {todoObj} todo задача.
+ * @returns компонент, содержащий в себе окно редактирования.
+ */
+export function EditableTodoNote({id, title, body, status, files}) {
     let dateOfNote = null;
     let timeOfNote = null;
     

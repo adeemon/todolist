@@ -3,9 +3,22 @@ import dayjs from "dayjs";
 import { useDispatch } from "react-redux";
 import { toggleFullMode } from "./todoNotesSlice";
 
+/**
+ * Компонент-обертка для отображения задачи.
+ * @param {todoObj} todo объект задачи
+ * @returns короткую запись задачи. 
+ */
 export function TodoNote ({id, title, date, status, onRemoveHandler, onToggleModeHandler}) {
+    /**
+     * Текущая дата.
+     */
     const dateNow = new dayjs();
     const dispatch = useDispatch();
+
+    /**
+     * Определяет значение класса для корректного отображения фона задачи в соответствии с
+     * её статусом выполнения.
+     */
     let todoClassName = "todo-note-container ";
     if (dateNow.diff(date) > 0 && status === false) {
         todoClassName = todoClassName + 'overdue-bckg';
@@ -13,6 +26,10 @@ export function TodoNote ({id, title, date, status, onRemoveHandler, onToggleMod
         todoClassName = todoClassName + (status ? "completed-bckg" : "uncompleted-bckg");
     }
 
+    /**
+     * Обработчик нажатия на кнопку "Открыть".
+     * @param {} id 
+     */
     const onEditHandler = (id) => {
         dispatch(toggleFullMode(id));
     }
